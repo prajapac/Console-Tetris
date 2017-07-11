@@ -31,6 +31,7 @@ public class ConsoleTetris {
 		}
 		
 		dropTetromino(gameBoard);
+		
 		try {
 			printgameBoard(gameBoard);
 		}
@@ -139,11 +140,62 @@ public class ConsoleTetris {
 		
 	}
 	
-	public static void dropTetromino(char[][] gameBoard){
-		boolean collision = false;
-		for(int i = 0; i < gameBoard.length - 1 ; i++) { // - 1 to prevent Array Out of Bounds Exception
-			for(int j = 0; j < gameBoard[i].length; j++) { 
-				if(gameBoard[i+1][j] == 1)
+	public static void dropTetromino(char[][] gameBoard){ //change to return boolean so we can know when to spawn next tetromino
+		
+		int tetrominoRow = -1; //holds the row of the tetromino
+		boolean tetrominoFound = false; //used to determine if row contains a tetromino
+		boolean collision = false; //used to determine if drop possible
+		boolean specialCase = true; //it's a special case if tetromino is a horizontal 'I' shaped one
+		
+		//find tetromino location in board
+		for(int i = 0; i < gameBoard.length && !tetrominoFound; i++) {
+			for(int j = 0; j < gameBoard[i].length; j++) {
+				if(gameBoard[i][j] == 1) {
+					tetrominoFound = !tetrominoFound;
+					tetrominoRow = i;
+				}
+			}
+			if(tetrominoFound) {
+				for(int j = 0; j < gameBoard[i].length; j++) {
+					if(gameBoard[i+1][j] == 1) {
+						specialCase = false; //the special case is basically when we just need to check the next row if tetromino can be dropped
+						System.out.println(tetrominoRow);
+					}
+				}
+			}
+		}
+		
+		//check if tetromino can be dropped
+		if(specialCase) { //horizontal I
+			if(tetrominoRow + 1 == gameBoard.length)
+				collision = true;
+			else {
+				for(int i = tetrominoRow; i < Math.min(tetrominoRow+1, gameBoard.length-1); i++) {
+					for(int j = 0; j < gameBoard[i].length; j++) {
+						if(gameBoard[i][j] == 1 && gameBoard[i+1][j] == 1)
+							collision = true;
+					}
+				}
+			}
+		}
+		
+		else { //any other tetromino
+			
+		}
+		
+		//drop the tetromino if feasible
+		if(!collision) {
+			for(int i = tetrominoRow, j = 0; j < gameBoard[i].length; j++) {
+				if(gameBoard[i][j] == 1) {
+					gameBoard[i+1][j] = 1; //move part of tetromino downwards
+					gameBoard[i][j] = 0; //clear part from old position
+				}
+			}
+		}
+		/*
+		for(int i = tetrominoRow; i < Math.min(tetrominoRow + 2, gameBoard.length); i++) {
+			for(int j = 0; j < gameBoard[i].length; j++) {
+				if(gameBoard[i+1][j] == 1 && gameBoard[i+2][j] == 1 )
 					collision = true;
 			}
 			if(!collision) {
@@ -152,6 +204,6 @@ public class ConsoleTetris {
 					gameBoard[i][j] = 0;
 				}
 			}
-		}
+		}*/
 	}
 }
